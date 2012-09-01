@@ -1,0 +1,275 @@
+#!/bin/bash
+# Cleanup, version 3
+
+#  Warning:
+#  -------
+#  This script uses quite a number of features that will be explained
+#+ later on.
+#  By the time you've finished the first half of the book,
+#+ there should be nothing mysterious about it.
+
+LOG_DIR=/var/log
+ROOT_UID=0     # Only users with $UID 0 have root privileges.
+E_XCD=86       # Can't change directory?
+E_NOTROOT=87   # Non-root exit error.
+WP_URL=http://wordpress.org/latest.tar.gz
+TARBALL=latest.tar.gz
+
+# Run as root
+if [ "$UID" -ne "$ROOT_UID" ]
+then
+  echo "Must be root to run this script."
+  exit $E_NOTROOT
+fi  
+
+if [ -n "$1" ]
+# Test whether command-line argument is present (non-empty).
+then
+  DIRECTORY=$1
+  ABPATH=$(readlink -f "$DIRECTORY")
+else  
+  echo "Must specify a directory where Wordpress will be unpacked."
+  exit 0
+fi  
+
+if [ -n "$2" ]
+# Test whether command-line argument is present (non-empty).
+then
+  DB=$2
+else  
+  echo "Must specify a name for the Wordpress database."
+  exit 0
+fi  
+
+if [ -n "$3" ]
+# Test whether command-line argument is present (non-empty).
+then
+  PORT=$3
+else  
+  echo "Must specify a port for nginx config"
+  exit 0
+fi  
+
+# create project dir if not exists
+if [ ! -d "$DIRECTORY" ]; then
+  mkdir $DIRECTORY
+fi
+
+# enter project directory
+cd $DIRECTORY
+
+# fetch and extract latest Wordpress
+wget $WP_URL
+tar -xzvf $TARBALL
+
+# get rid of the wordpress directory
+mv wordpress/* .
+rm -rf wordpress
+
+# create sites-available config
+echo "
+server
+{
+    listen $PORT;
+    server_name localhost;
+ 
+    access_log /var/log/nginx/$dir.access.log;
+    error_log /var/log/nginx/$dir.error.log;
+ 
+    root $ABPATH;
+
+    index index.php;
+ 
+    # enforce www (exclude certain subdomains)
+    #if (\$host !~* ^(www|subdomain))
+    #{
+    #   rewrite ^/(.*)$ \$scheme://www.\$host/\$1 permanent;
+    #}
+ 
+    # enforce NO www
+    if (\$host ~* ^www\.(.*))
+    {
+        set \$host_without_www \$1;
+        rewrite ^(.+)[^(css|js|gif|...)]$ \$scheme://$host_without_www/\$1 permanent;
+    }
+ 
+    # unless the request is for a valid file, send to bootstrap
+    if (!-e \$request_filename)
+    {
+        rewrite ^(.+)$ /index.php?q=\$1 last;
+    }
+ 
+    # catch all
+    error_page 404 /index.php;
+ 
+    # use fastcgi for all php files
+    location ~ \.php$
+    {
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+        include fastcgi_params;
+    }
+ 
+    # deny access to apache .htaccess files
+    location ~ /\.ht
+    {
+        deny all;
+    }
+    
+    location / {
+      try_files \$uri \$uri/ /index.php?\$args;
+      #index index.php index.html index.htm;
+    }
+}" > /etc/nginx/sites-available/$DIRECTORY
+
+# generate random hashes for wp-config file
+declare -A HASH
+for i in {0..7}
+do
+  HASH[$i]=$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32) 
+done
+
+# create wp-config file
+echo "
+<?php
+/**
+ * The base configurations of the WordPress.
+ *
+ * This file has the following configurations: MySQL settings, Table Prefix,
+ * Secret Keys, WordPress Language, and ABSPATH. You can find more information
+ * by visiting {@link http://codex.wordpress.org/Editing_wp-config.php Editing
+ * wp-config.php} Codex page. You can get the MySQL settings from your web host.
+ *
+ * This file is used by the wp-config.php creation script during the
+ * installation. You don't have to use the web site, you can just copy this file
+ * to "wp-config.php" and fill in the values.
+ *
+ * @package WordPress
+ */
+
+// ** MySQL settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define('DB_NAME', '$DB');
+
+/** MySQL database username */
+define('DB_USER', 'root');
+
+/** MySQL database password */
+define('DB_PASSWORD', '');
+
+/** MySQL hostname */
+define('DB_HOST', 'localhost');
+
+/** Database Charset to use in creating database tables. */
+define('DB_CHARSET', 'utf8');
+
+/** The Database Collate type. Don't change this if in doubt. */
+define('DB_COLLATE', '');
+
+/**#@+
+ * Authentication Unique Keys and Salts.
+ *
+ * Change these to different unique phrases!
+ * You can generate these using the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}
+ * You can change these at any point in time to invalidate all existing cookies. This will force all users to have to log in again.
+ *
+ * @since 2.6.0
+ */
+define('AUTH_KEY',         '${HASH[0]}');
+define('SECURE_AUTH_KEY',  '${HASH[1]}');
+define('LOGGED_IN_KEY',    '${HASH[2]}');
+define('NONCE_KEY',        '${HASH[3]}');
+define('AUTH_SALT',        '${HASH[4]}');
+define('SECURE_AUTH_SALT', '${HASH[5]}');
+define('LOGGED_IN_SALT',   '${HASH[6]}');
+define('NONCE_SALT',       '${HASH[7]}');
+
+/**#@-*/
+
+/**
+ * WordPress Database Table prefix.
+ *
+ * You can have multiple installations in one database if you give each a unique
+ * prefix. Only numbers, letters, and underscores please!
+ */
+\$table_prefix  = 'wp_';
+
+/**
+ * WordPress Localized Language, defaults to English.
+ *
+ * Change this to localize WordPress. A corresponding MO file for the chosen
+ * language must be installed to wp-content/languages. For example, install
+ * de_DE.mo to wp-content/languages and set WPLANG to 'de_DE' to enable German
+ * language support.
+ */
+define('WPLANG', '');
+
+/**
+ * For developers: WordPress debugging mode.
+ *
+ * Change this to true to enable the display of notices during development.
+ * It is strongly recommended that plugin and theme developers use WP_DEBUG
+ * in their development environments.
+ */
+define('WP_DEBUG', true);
+
+/* That's all, stop editing! Happy blogging. */
+
+/** Absolute path to the WordPress directory. */
+if ( !defined('ABSPATH') )
+  define('ABSPATH', dirname(__FILE__) . '/');
+
+/** Sets up WordPress vars and included files. */
+require_once(ABSPATH . 'wp-settings.php');
+" > $ABPATH/wp-config.php
+
+# enable site
+sudo ln -s /etc/nginx/sites-available/$DIRECTORY /etc/nginx/sites-enabled/$DIRECTORY
+
+# restart nginx
+echo "Restarting nginx..."
+sudo /etc/init.d/nginx restart
+echo "nginx restarted successfully"
+
+# create mysql database
+echo "Creating mysql database..."
+mysql -u root -e "create database $DB"
+echo "$DB database created"
+
+echo "DONE!"
+echo "You may view your site at http://localhost:$PORT"
+exit 0
+
+if [ `pwd` != "$LOG_DIR" ]  # or   if [ "$PWD" != "$LOG_DIR" ]
+                            # Not in /var/log?
+then
+  echo "Can't change to $LOG_DIR."
+  exit $E_XCD
+fi  # Doublecheck if in right directory before messing with log file.
+
+# Far more efficient is:
+#
+# cd /var/log || {
+#   echo "Cannot change to necessary directory." >&2
+#   exit $E_XCD;
+# }
+
+
+
+
+tail -n $lines messages > mesg.temp # Save last section of message log file.
+mv mesg.temp messages               # Rename it as system log file.
+
+
+#  cat /dev/null > messages
+#* No longer needed, as the above method is safer.
+
+cat /dev/null > wtmp  #  ': > wtmp' and '> wtmp'  have the same effect.
+echo "Log files cleaned up."
+#  Note that there are other log files in /var/log not affected
+#+ by this script.
+
+exit 0
+#  A zero return value from the script upon exit indicates success
+#+ to the shell.
