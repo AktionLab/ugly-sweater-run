@@ -7,9 +7,9 @@ set :port, '2222'
 set :application, 'ugly-sweater-run'
 
 # the rest should be good
-set :repository,  "git@github.com:AktionLab/#{application}.git" 
+set :repository,  "ugly-sweater:AktionLab/ugly-sweater-run.git" 
 set :deploy_to, "/home/#{user}/#{application}" 
-set :deploy_via, :remote_cache
+#set :deploy_via, :remote_cache
 set :scm, 'git'
 set :branch, 'master'
 set :git_shallow_clone, 1
@@ -20,18 +20,19 @@ server domain, :app, :web
 role :db, domain, :primary => true
 
 set :app_symlinks, ["wp-content/uploads"]
-before  'deploy:update_code', 'wordpress:install'
+after 'deploy:symlink', 'wordpress:install'
 after 'wordpress:install', 'wordpress:symlinks:setup'
-after 'deploy:create_symlink', 'wordpress:symlinks:update'
+after 'wordpress:symlinks:setup', 'wordpress:symlinks:update'
+after 'wordpress:symlinks:update', 'nginx:config'
+after 'nginx:config', 'nginx:reload'
+after 'nginx:reload', 'deploy:cleanup'
 
 namespace :wordpress do
+  desc "Download and unpack Wordpress"
   task :install do
-    run "cd #{release_path}"
-    run "wget http://wordpress.org/latest.tar.gz"
-    run "tar xzvf latest.tar.gz"
-    run "mv wordpress/* ."
-    run "rm -rf wordpress"
-    run "rm -rf wp-content"
+    run "cd #{current_path} && wget http://wordpress.org/latest.tar.gz && tar -xzvf latest.tar.gz"
+    run "rm -rf #{current_path}/wordpress/wp-content && mv #{current_path}/wordpress/* #{current_path}/"
+    run "rm -rf #{current_path}/wordpress && rm #{current_path}/latest.tar.gz"
   end
 
   namespace :symlinks do
@@ -45,10 +46,23 @@ namespace :wordpress do
     desc "Link public directories to shared location."
     task :update, :roles => [:web] do
       if app_symlinks
-        app_symlinks.each { |link| run "ln -nfs #{shared_path}/public/#{link} #{current_path}/public/#{link}" }
+        app_symlinks.each { |link| run "ln -nfs #{shared_path}/public/#{link} #{current_path}/#{link}" }
       end
-      send(run_method, "rm -f #{current_path}/public/wp-config.php")
-      send(run_method, "ln -nfs #{shared_path}/public/wp-config.php #{current_path}/public/#{wordpress_dir}/wp-config.php")
+      send(run_method, "rm -f #{current_path}/wp-config.php")
+      send(run_method, "ln -nfs #{shared_path}/public/wp-config.php #{current_path}/wp-config.php")
     end
+  end
+end
+
+namespace :nginx do
+  desc "Configure nginx"
+  task :config do
+    run "sudo ln -s /etc/nginx/sites-enabled/#{application} #{current_path}/config/nginx.conf"
+    run "sudo /etc/init.d/nginx reload"
+  end
+
+  desc "Restart nginx"
+  task :reload do
+    run "sudo /etc/init.d/nginx reload"
   end
 end
