@@ -4,19 +4,35 @@
 
 body { }
 
+.sprite { background:url('../img/sprite.png') no-repeat; }
 
+h1, h2, h3, nav { font-family: 'Alfa Slab One', Arial, sans-serif; }
 
 /* =============================================================================
    Header
    ========================================================================== */
 
-#banner { }
-
-/* Fixed Topbar Navigation */
-body.top-navbar { padding-top: 60px; }
-body.admin-bar .navbar-fixed-top { top: 28px; }
-
-
+#banner { height:120px; position:relative; }
+  .brand { width:190px; height:120px; display:block; 
+    text-indent:-9999px; background-position: 0 0; }
+  #nav-main { position:absolute; right:0; top:10px; }
+    #nav-main li { padding-left:16px; float:left; 
+      background: url('../img/sprite.png') -199px -96px; }
+      #nav-main li:first-child { padding:0; background-image:none; }   
+      #nav-main li a { padding:5px; color:#cb1323; 
+        text-transform:uppercase; letter-spacing:1px; font-size:18px; }
+        #nav-main li a:hover { color:#e10215; background:transparent; }
+  #socials { position:absolute; right:0; top:60px; list-style:none;}
+    #socials li { float:left; margin-left:2px; }
+      #socials li a { width:36px; height:36px; display:block; text-indent:-9999px; }
+      .facebook { background-position:-199px -37px; }
+        .facebook:hover { background-position:-199px 0; }
+      .twitter { background-position:-237px -37px; }
+        .twitter:hover { background-position: -237px 0; }
+      .youtube { background-position:-275px -37px; }
+        .youtube:hover { background-position:-275px 0; }
+      .pinterest { background-position:-311px -37px; }
+        .pinterest:hover { background-position:-311px 0; }                
 
 /* ==========================================================================
    Content
@@ -63,24 +79,10 @@ body.admin-bar .navbar-fixed-top { top: 28px; }
 
 
 /* ==========================================================================
-   WordPress Generated Classes
-   See: http://codex.wordpress.org/CSS#WordPress_Generated_Classes
+   Utility Classes
    ========================================================================== */
 
 .aligncenter { display: block; margin: 0 auto; }
 .alignleft { float: left; }
 .alignright { float: right; }
 figure.alignnone { margin-left: 0; margin-right: 0; }
-
-
-
-/* ==========================================================================
-   Media Queries
-   ========================================================================== */
-
-@media (max-width: 979px) {
-  /* Fix top padding when using the responsive grid with the fixed topbar */
-  body.top-navbar {
-    padding-top: 0;
-  }
-}

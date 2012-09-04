@@ -1,8 +1,14 @@
+<div class="container">
+
 <header id="banner" role="banner">
-  <div class="container">
-    <a class="brand" href="<?php echo home_url(); ?>/"><?php bloginfo('name'); ?></a>
-    <nav id="nav-main" role="navigation">
-      <?php wp_nav_menu(array('theme_location' => 'primary_navigation', 'menu_class' => 'nav nav-pills')); ?>
-    </nav>
-  </div>
+  <a class="brand sprite" href="<?php echo home_url(); ?>/"><?php bloginfo('name'); ?></a>
+  <nav id="nav-main" role="navigation">
+    <?php wp_nav_menu(array('theme_location' => 'primary_navigation', 'menu_class' => 'nav')); ?>
+  </nav>
+  <ul id="socials">
+    <li><a class="facebook sprite" href="" target="_blank">Facebook</a></li>
+    <li><a class="twitter sprite" href="" target="_blank">Twitter</a></li>
+    <li><a class="youtube sprite" href="" target="_blank">YouTube</a></li>
+    <li><a class="pinterest sprite" href="" target="_blank">Pinterest</a></li>
+  </ul>
 </header>

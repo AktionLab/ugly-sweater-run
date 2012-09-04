@@ -7,9 +7,8 @@
   <meta charset="utf-8">
   <title><?php wp_title('|', true, 'right'); bloginfo('name'); ?></title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <link href='http://fonts.googleapis.com/css?family=Alfa+Slab+One' rel='stylesheet' type='text/css'>
   <script src="<?php echo get_template_directory_uri(); ?>/assets/js/vendor/modernizr-2.6.1.min.js"></script>
-
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
   <script>window.jQuery || document.write('<script src="<?php echo get_template_directory_uri(); ?>/assets/js/vendor/jquery-1.8.0.min.js"><\/script>')</script>
 
