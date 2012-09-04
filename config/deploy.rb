@@ -25,7 +25,8 @@ after 'wordpress:install', 'wordpress:symlinks:setup'
 after 'wordpress:symlinks:setup', 'wordpress:symlinks:update'
 after 'wordpress:symlinks:update', 'nginx:config'
 after 'nginx:config', 'nginx:reload'
-after 'nginx:reload', 'deploy:cleanup'
+after 'nginx:reload', 'wordpress:permissions',
+after 'wordpress:permissions', 'deploy:cleanup'
 
 namespace :wordpress do
   desc "Download and unpack Wordpress"
@@ -33,6 +34,10 @@ namespace :wordpress do
     run "cd #{current_path} && wget http://wordpress.org/latest.tar.gz && tar -xzvf latest.tar.gz"
     run "cp -rf #{current_path}/wordpress/* #{current_path}/"
     run "rm -rf #{current_path}/wordpress && rm #{current_path}/latest.tar.gz"
+  end
+
+  task :permissions do
+    run "sudo chown www-data releases && sudo chown www-data releases/*"
   end
 
   namespace :symlinks do
