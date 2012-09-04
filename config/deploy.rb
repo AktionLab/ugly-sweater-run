@@ -19,13 +19,12 @@ set :use_sudo, false
 server domain, :app, :web
 role :db, domain, :primary => true
 
-set :app_symlinks, ["wp-content/uploads"]
+set :app_symlinks, ["uploads"]
 after 'deploy:symlink', 'wordpress:install'
-after 'wordpress:install', 'wordpress:symlinks:setup'
-after 'wordpress:symlinks:setup', 'wordpress:symlinks:update'
+after 'wordpress:install', 'wordpress:symlinks:update'
 after 'wordpress:symlinks:update', 'nginx:config'
 after 'nginx:config', 'nginx:reload'
-after 'nginx:reload', 'wordpress:permissions',
+after 'nginx:reload', 'wordpress:permissions'
 after 'wordpress:permissions', 'deploy:cleanup'
 
 namespace :wordpress do
@@ -37,14 +36,16 @@ namespace :wordpress do
   end
 
   task :permissions do
-    run "sudo chown www-data releases && sudo chown www-data releases/*"
+    run "sudo chown deployer:www-data #{release_path} && sudo chown deployer:www-data #{release_path}/*"
+
+
   end
 
   namespace :symlinks do
     desc "Setup application symlinks in the public"
     task :setup, :roles => [:web] do
       if app_symlinks
-        app_symlinks.each { |link| run "mkdir -p #{shared_path}/public/#{link}" }
+        app_symlinks.each { |link| run "mkdir #{shared_path}/public/#{link}" }
       end
     end
   
