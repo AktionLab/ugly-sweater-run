@@ -1,6 +1,6 @@
 .htaccess
 latest.tar.gz
-index.php
+/index.php
 wp-*.php
 xmlrpc.php
 wp-admin/

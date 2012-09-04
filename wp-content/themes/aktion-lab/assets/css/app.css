@@ -34,6 +34,7 @@ h1, h2, h3, nav { font-family: 'Alfa Slab One', Arial, sans-serif; }
       .pinterest { background-position:-311px -37px; }
         .pinterest:hover { background-position:-311px 0; }                
 
+
 /* ==========================================================================
    Content
    ========================================================================== */
@@ -41,13 +42,12 @@ h1, h2, h3, nav { font-family: 'Alfa Slab One', Arial, sans-serif; }
 #content { }
 
 
-
 /* ==========================================================================
-   Primary Content
+   Front Page
    ========================================================================== */
 
-#main { }
-
+#home-boxes { list-style:none; }
+  #home-boxes div {height:100px; background:#ccc; }
 
 
 /* ==========================================================================
