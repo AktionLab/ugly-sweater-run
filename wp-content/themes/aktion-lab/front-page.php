@@ -1,4 +1,4 @@
-<div id="hero" class="row">
+<div id="hero">
   <?php while (have_posts()) : the_post(); ?>
     <?php the_content(); ?>
   <?php endwhile; ?>
