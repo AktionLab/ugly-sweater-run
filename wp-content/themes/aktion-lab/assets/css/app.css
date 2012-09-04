@@ -6,7 +6,7 @@ body { }
 
 .sprite { background:url('../img/sprite.png') no-repeat; }
 
-h1, h2, h3, nav { font-family: 'Alfa Slab One', Arial, sans-serif; }
+h1, h2, h3, nav { font-family: 'Alfa Slab One', Arial, sans-serif; font-weight:400; }
 
 /* =============================================================================
    Header
@@ -22,6 +22,7 @@ h1, h2, h3, nav { font-family: 'Alfa Slab One', Arial, sans-serif; }
       #nav-main li a { padding:5px; color:#cb1323; 
         text-transform:uppercase; letter-spacing:1px; font-size:18px; }
         #nav-main li a:hover { color:#e10215; background:transparent; }
+        #nav-main li:last-child a { padding-right:0; }
   #socials { position:absolute; right:0; top:60px; list-style:none;}
     #socials li { float:left; margin-left:2px; }
       #socials li a { width:36px; height:36px; display:block; text-indent:-9999px; }
