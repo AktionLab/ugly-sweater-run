@@ -1,0 +1,1 @@
+<?php if (function_exists('nivoslider4wp_show')) { nivoslider4wp_show(); } ?>
