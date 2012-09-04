@@ -1,5 +1,7 @@
 <div id="hero" class="row">
-  <?php the_content(); ?>
+  <?php while (have_posts()) : the_post(); ?>
+    <?php the_content(); ?>
+  <?php endwhile; ?>
   <nav id="nav-cities" role="navigation">
     <?php wp_nav_menu(array('theme_location' => 'cities_navigation', 'menu_class' => 'nav')); ?>
   </nav>
