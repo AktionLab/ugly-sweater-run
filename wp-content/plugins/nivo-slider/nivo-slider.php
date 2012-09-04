@@ -1271,6 +1271,7 @@ class WordpressNivoSlider {
         $plugin_themes = glob(WP_PLUGIN_DIR .'/'. $this->plugin_folder .'/scripts/nivo-slider/themes/*', GLOB_ONLYDIR);
         //$plugin_themes[] = 0;
         
+        print_r($upload_dir);
         $upload_dir = wp_upload_dir();
         $custom_themes = glob($upload_dir['basedir'].'/nivo-themes/*', GLOB_ONLYDIR);
         //$custom_themes[] = 1;
