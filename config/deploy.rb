@@ -31,7 +31,7 @@ namespace :wordpress do
   desc "Download and unpack Wordpress"
   task :install do
     run "cd #{current_path} && wget http://wordpress.org/latest.tar.gz && tar -xzvf latest.tar.gz"
-    run "rm -rf #{current_path}/wordpress/wp-content && mv #{current_path}/wordpress/* #{current_path}/"
+    run "cp -rf #{current_path}/wordpress/* #{current_path}/"
     run "rm -rf #{current_path}/wordpress && rm #{current_path}/latest.tar.gz"
   end
 
@@ -57,7 +57,7 @@ end
 namespace :nginx do
   desc "Configure nginx"
   task :config do
-    run "sudo ln -s /etc/nginx/sites-enabled/#{application} #{current_path}/config/nginx.conf"
+    run "sudo ln -nfs #{shared_path}/public/system/nginx.conf /etc/nginx/sites-enabled/#{application}"
     run "sudo /etc/init.d/nginx reload"
   end
 
