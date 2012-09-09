@@ -13,17 +13,17 @@ h1, h2, h3, nav { font-family: 'Alfa Slab One', Arial, sans-serif; font-weight:4
    ========================================================================== */
 
 #banner { height:120px; position:relative; }
-  .brand { width:190px; height:120px; display:block; 
+  .brand { width:190px; height:120px; display:block; margin:0 0 0 30px; 
     text-indent:-9999px; background-position: 0 0; }
-  #nav-main { position:absolute; right:0; top:10px; }
-    #nav-main li { padding-left:16px; float:left; 
+  #nav-main { position:absolute; right:0; top:12px; }
+    .nav.snow li { padding-left:16px; float:left; 
       background: url('../img/sprite.png') -199px -96px; }
-      #nav-main li:first-child { padding:0; background-image:none; }   
-      #nav-main li a { padding:5px; color:#cb1323; 
+      .nav.snow li:first-child { padding:0; background-image:none; }   
+      .nav.snow li a { padding:5px; color:#cb1323; 
         text-transform:uppercase; letter-spacing:1px; font-size:18px; }
-        #nav-main li a:hover { color:#e10215; background:transparent; }
+        .nav.snow li a:hover { color:#e10215; background:transparent; }
         #nav-main li:last-child a { padding-right:0; }
-  #socials { position:absolute; right:0; top:60px; list-style:none;}
+  #socials { position:absolute; right:0; top:50px; list-style:none;}
     #socials li { float:left; margin-left:2px; }
       #socials li a { width:36px; height:36px; display:block; text-indent:-9999px; }
       .facebook { background-position:-199px -37px; }
@@ -47,9 +47,31 @@ h1, h2, h3, nav { font-family: 'Alfa Slab One', Arial, sans-serif; font-weight:4
    Front Page
    ========================================================================== */
 
-#home-boxes { list-style:none; }
-  #home-boxes div {height:100px; background:#ccc; }
+#hero { position:relative; }
+  #nav-cities { position: absolute; top:0; left:20px; width:210px; height:340px; 
+    padding:10px 0; background: url('../img/bg-blue.png') top left repeat; }
+    #nav-cities a { padding:5px 8px; color:#fff; text-transform:uppercase; 
+      letter-spacing:1px; font-size:18px; text-shadow: 1px 1px 2px #555; }     
+    #nav-cities a:hover { background: url('../img/bg-blue.png') top left repeat;
+      text-shadow: 1px 1px 2px #111; }
 
+#hero-subhead { padding:0; margin: 5px 0 24px; text-align:center; text-transform:uppercase; letter-spacing: 1px; font-size:30px; color:#cb1323; }
+  #hero-subhead span { width:80px; height:40px; padding:14px 0; margin-bottom:-22px; display:inline-block; background-position: -440px -235px; }  
+  #hero-subhead span:last-child { background-position: -522px -235px; }
+
+#home-boxes { height:140px; }
+  #home-boxes a { width:220px; height:140px; background-color:#cb1323;  }
+    #home-boxes a h2 { margin-top:10px; padding:5px 10px; float:left;
+      font-size:18px; line-height:24px; color:#fff; text-transform:uppercase;
+      background: transparent url('../img/bg-blue.png') left top repeat;}
+    #home-boxes a:hover { text-decoration:none; }
+    #home-boxes a:hover h2 { background:#fff url('../img/bg-blue.png') left top repeat; }
+  #home-boxes .hb-about { background-position: 0 -127px; }
+    #home-boxes .hb-about h2 { margin-top: 30px; }
+  #home-boxes .hb-find { background-position: -220px -127px; }
+  #home-boxes .hb-gallery { background-position: 0 -267px; }
+    #home-boxes .hb-gallery h2 { margin-top: 30px; }
+  #home-boxes .hb-press { background-position: -220px -267px; }
 
 /* ==========================================================================
    Sidebar
@@ -75,7 +97,13 @@ h1, h2, h3, nav { font-family: 'Alfa Slab One', Arial, sans-serif; font-weight:4
    Footer
    ========================================================================== */
 
-#content-info { }
+#content-info { position:relative; height:100px; margin:20px 0;}
+  #nav-footer { float:left; }
+    #nav-footer li:first-child a { padding-left:0; }
+  .sponsor { width:160px; height:100px; text-indent:-9999px; position:absolute;
+    left: 390px; top:0; background-position: -440px -127px; }
+  #content-info p { float:right; text-transform:uppercase; color:#08c; font-size:10px; 
+    margin-top:2px; }  
 
 
 
@@ -87,3 +115,4 @@ h1, h2, h3, nav { font-family: 'Alfa Slab One', Arial, sans-serif; font-weight:4
 .alignleft { float: left; }
 .alignright { float: right; }
 figure.alignnone { margin-left: 0; margin-right: 0; }
+.clear { clear:both; }

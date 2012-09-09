@@ -3,7 +3,7 @@
 <header id="banner" role="banner">
   <a class="brand sprite" href="<?php echo home_url(); ?>/"><?php bloginfo('name'); ?></a>
   <nav id="nav-main" role="navigation">
-    <?php wp_nav_menu(array('theme_location' => 'primary_navigation', 'menu_class' => 'nav')); ?>
+    <?php wp_nav_menu(array('theme_location' => 'primary_navigation', 'menu_class' => 'nav snow')); ?>
   </nav>
   <ul id="socials">
     <li><a class="facebook sprite" href="" target="_blank">Facebook</a></li>

@@ -5,18 +5,26 @@
   <nav id="nav-cities" role="navigation">
     <?php wp_nav_menu(array('theme_location' => 'cities_navigation', 'menu_class' => 'nav')); ?>
   </nav>
-</div>
+</div><!--hero-->
+
+  
+<h1 id="hero-subhead">
+  <span class="sprite"></span>
+  The Ugliest 5k on the Planet!
+  <span class="sprite"></span>
+</h1>
+
 <div id="home-boxes" class="row">
-  <div class="hb-about span3">
-    <h2><a href="">What is it?</a></h2>
-  </div>
-  <div class="hb-find span3">
-    <h2><a href="">Find a run</a></h2>
-  </div>
-  <div class="hb-gallery span3">
-    <h2><a href="">Gallery</a></h2>
-  </div>
-  <div class="hb-press span3">
-    <h2><a href="">Press</a></h2>
-  </div>
-</div><!--row-->  
+  <a class="hb-about sprite span3" href="">
+    <h2>What is it?</h2>
+  </a>
+  <a class="hb-find sprite span3" href="">
+    <h2>Find a run</h2>
+  </a>
+  <a class="hb-gallery sprite span3" href="">
+    <h2>Gallery</h2>
+  </a>
+  <a class="hb-press sprite span3" href="">
+    <h2>Press</h2>
+  </a>
+</div><!--home-boxes-row-->  
