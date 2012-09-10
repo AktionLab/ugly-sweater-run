@@ -1,5 +1,4 @@
 jQuery(function(){
-
 	boxMargin = parseInt( jQuery('.mg_box').css('margin-left') );
 	boxBorder = parseInt( jQuery('.mg_box').css('border-left-width') );
 	imgPadding = parseInt( jQuery('.img_wrap').css('padding-left') );
@@ -44,13 +43,15 @@ jQuery(function(){
 		jQuery('.mg_container').addClass('lcwp_loading');
 		jQuery('.mg_container .thumb').imagesLoaded(function() {
 			var a = 0;
-			jQuery('.mg_container > div').each(function() {
+			jQuery('.mg_container > div, ').each(function() {
 				jQuery(this).delay(150*a).animate({opacity: 1}, 400);	
+				jQuery(this).find('.thumb').css('opacity', 1);
 				a = a+1;
 			});
 			jQuery('.mg_container').removeClass('lcwp_loading');
 		});
 	});
+	
 	
 	// dynamic $container
 	jQuery('.mg_grid_wrap').live('click', function(){
@@ -95,7 +96,7 @@ jQuery(function(){
 	};
 	
 	
-	window.reresize_w = function() {
+	 window.reresize_w = function() {
 		jQuery.each(mg_sizes, function(key, val) {
 			if( $target.hasClass('col' + val) )	{ wsize = ($mg_r_width - 0.2) * get_size(val);}
 		});
@@ -107,7 +108,7 @@ jQuery(function(){
 	};
 	
 	
-	window.reresize_h = function() {
+	 window.reresize_h = function() {
 		jQuery.each(mg_sizes, function(key, val) {
 			if( $target.hasClass('row' + val) )	{ hsize = ($mg_r_width - 0.2) * get_size(val);}
 		});							
@@ -119,7 +120,7 @@ jQuery(function(){
 	};
 	
 	
-	window.get_box_perc = function(axis) {
+	 window.get_box_perc = function(axis) {
 		if(axis == 'w') {var aclass = 'col';}
 		else {var aclass = 'row';}
 		
@@ -129,7 +130,7 @@ jQuery(function(){
 	};	
 
 	
-	window.perc_to_px = function(size, with_other) {
+	 window.perc_to_px = function(size, with_other) {
 		var px = parseFloat( (get_size(size) * $container.width()) - (boxBorder * 2) );
 		
 		if( with_other === undefined ) { return px; }		
@@ -137,7 +138,7 @@ jQuery(function(){
 	};
 	
 	
-	window.img_wrap_rs = function(axis) {
+	 window.img_wrap_rs = function(axis) {
 		if(axis == 'w') {
 			var size = reresize_w() - (imgPadding * 2);
 		}		
@@ -148,7 +149,7 @@ jQuery(function(){
 	};
 
 
-	window.size_boxes = function(target) {
+	 window.size_boxes = function(target) {
 		jQuery(target).each(function(index) {
 			$target = jQuery(this);
 
@@ -188,7 +189,7 @@ jQuery(function(){
 	
 	
 	// IE transitions fallback
-	window.mg_ie_fallback = function() {
+	 window.mg_ie_fallback = function() {
 		jQuery('.mg_box .overlays').children().hide();
 		
 		jQuery('.mg_box .img_wrap').hover(
@@ -197,6 +198,36 @@ jQuery(function(){
 				jQuery(this).find('.overlays').children().fadeIn('fast');
 			}
 		);
+	};
+
+	
+	// Grid handling for AJAX pages
+	window.mg_ajax_init = function(grid_id) {
+		var cont_id = 'mg_grid_'+ grid_id;
+		
+		boxMargin = parseInt( jQuery('.mg_box').css('margin-left') );
+		boxBorder = parseInt( jQuery('.mg_box').css('border-left-width') );
+		imgPadding = parseInt( jQuery('.img_wrap').css('padding-left') );
+		
+		$container = jQuery( '#' + cont_id );
+		size_boxes('.mg_box');
+		masonerize(cont_id);
+		
+		// fallback for IE
+		if(	!Modernizr.csstransitions ) {
+			mg_ie_fallback();	
+		}
+		
+		// when img loaded, display
+		jQuery('#' + cont_id).addClass('lcwp_loading');
+		// show
+		var a = 0;
+		jQuery('#' + cont_id +' > div').each(function() {
+			jQuery(this).delay(150*a).animate({opacity: 1}, 400);
+			jQuery(this).find('.thumb').css('opacity', 1);
+			a = a+1;
+		});
+		jQuery('#' + cont_id).removeClass('lcwp_loading');
 	};
 
 
@@ -239,7 +270,7 @@ jQuery(function(){
 		});
 
 		return true;
-	}
+	};
 	
 	
 	// create the navigator of visible items of a defined grid for opened items
@@ -289,7 +320,7 @@ jQuery(function(){
 		}
 		
 		jQuery('#mg_nav').prepend(prev).append(next + '<p><span></span></p>');
-	}
+	};
 	
 	
 	// next / prev titles show
@@ -362,7 +393,7 @@ jQuery(function(){
 				slideshow: false
 			});	
 		}
-	}
+	};
 	
 	
 	// resize video 
@@ -378,7 +409,7 @@ jQuery(function(){
 	// opened item resizing functions
 	function mg_item_resize() {
 		mg_resize_video();
-	}
+	};
 		
 		
 	// on resize
@@ -410,7 +441,7 @@ jQuery(function(){
 				}
 			});	
 		}
-	}
+	};
 
 	
 	// cat filter
@@ -443,7 +474,12 @@ jQuery(function(){
 			
 			var full_top_space = parseInt( (top_margin.top + jQuery('#mg_overlay_content').height()) + 90 - top_scroll );
 			var diff = jQuery(window).height() - full_top_space;
-			
+
+			// check the lightbox opacity
+			if( jQuery('#mg_overlay_content').css('opacity') != 1 ) { 
+				jQuery('#mg_overlay_content').css('opacity', 1); 
+			}
+
 			// top position
 			if(top_scroll < (top_margin.top - 60)) {
 				setTimeout(function() {
@@ -466,5 +502,5 @@ jQuery(function(){
 			}
 		}
 	});
-	
+
 });

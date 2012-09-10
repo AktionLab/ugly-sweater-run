@@ -180,17 +180,17 @@ span.mg_overlay_tit {
 <?php if(get_option('mg_item_icons') == 'light') : ?>
 #mg_full_overlay .mg_item_load,
 #mg_full_overlay .mg_item_featured {
-	background-image: url(../img/loader_w.gif);
+	background-image: url(<?php echo MG_URL; ?>/img/loader_w.gif);
 }	
 	
 #mg_close {
-	background-image: url(../img/item_close_w.png);
+	background-image: url(<?php echo MG_URL; ?>/img/item_close_w.png);
 }	
 #mg_nav .mg_nav_prev span {
-	background-image: url(../img/item_prev_w.png);		
+	background-image: url(<?php echo MG_URL; ?>/img/item_prev_w.png);		
 }
 #mg_nav .mg_nav_next span {
-	background-image: url(../img/item_next_w.png);	
+	background-image: url(<?php echo MG_URL; ?>/img/item_next_w.png);	
 }
 <?php endif; ?>
 

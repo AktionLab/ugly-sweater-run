@@ -61,7 +61,7 @@ add_action('wp_ajax_mg_del_grid', 'mg_del_grid_term');
 
 function mg_grid_builder() {
 	require_once(MG_DIR . '/functions.php');
-	$tt_path = MG_URL . '/classes/timthumb.php';
+	$tt_path = MG_TT_URL;
 	
 	if(!isset($_POST['grid_id'])) {die('data is missing');}
 	$grid_id = addslashes($_POST['grid_id']);
@@ -225,7 +225,7 @@ add_action('wp_ajax_mg_grid_builder', 'mg_grid_builder');
 
 function mg_item_cat_posts($fnc_cat = false) {	
 	require_once(MG_DIR . '/functions.php');
-	$tt_path = MG_URL . '/classes/timthumb.php';
+	$tt_path = MG_TT_URL;
 
 	$cat = $fnc_cat;
 	// if is not called directly
@@ -283,7 +283,7 @@ add_action('wp_ajax_mg_item_cat_posts', 'mg_item_cat_posts');
 
 function mg_add_item_to_builder() {	
 	require_once(MG_DIR . '/functions.php');
-	$tt_path = MG_URL . '/classes/timthumb.php';
+	$tt_path = MG_TT_URL;
 	
 	if(!isset($_POST['item_id'])) {die('data is missing');}
 	$item_id = addslashes($_POST['item_id']);
@@ -414,18 +414,22 @@ add_action('wp_ajax_mg_save_grid', 'mg_save_grid');
 
 function mg_img_picker() {	
 	require_once(MG_DIR . '/functions.php');
-	$tt_path = MG_URL . '/classes/timthumb.php'; 
+	$tt_path = MG_TT_URL; 
 	
 	if(!isset($_POST['page'])) {$page = 1;}
-	$page = (int)addslashes($_POST['page']);
-	$img_data = mg_library_images($page);
+	else {$page = (int)addslashes($_POST['page']);}
+	
+	if(!isset($_POST['per_page'])) {$per_page = 15;}
+	else {$per_page = (int)addslashes($_POST['per_page']);}
+	
+	$img_data = mg_library_images($page, $per_page);
 	
 	echo '<ul>';
 	
 	if($img_data['tot'] == 0) {echo '<p>No images found .. </p>';}
 	else {
 		foreach($img_data['img'] as $img) {
-			echo '<li><img src="'.$tt_path.'?src='.$img.'&w=90&h=90" id="'.$img.'" /></li>';	
+			echo '<li><img src="'.$tt_path.'?src='.$img['url'].'&w=90&h=90" id="'.$img['id'].'" /></li>';	
 		}
 	}
 	
@@ -434,18 +438,19 @@ function mg_img_picker() {
 	<br class="lcwp_clear" />
 	<table cellspacing="0" cellpadding="5" border="0" width="100%">
 		<tr>
-			<td style="width: 40%;">';			
+			<td style="width: 35%;">';			
 			if($page > 1)  {
 				echo '<input type="button" class="mg_img_pick_back button-secondary" id="slp_'. ($page - 1) .'" name="mgslp_p" value="&laquo; Previous images" />';
 			}
 			
-		echo '</td><td style="width: 20%; text-align: center;">';
+		echo '</td><td style="width: 30%; text-align: center;">';
 		
 			if($img_data['tot'] > 0 && $img_data['tot_pag'] > 1) {
-				echo '<em>page '.$img_data['pag'].' of '.$img_data['tot_pag'].'</em>';	
+				echo '<em>page '.$img_data['pag'].' of '.$img_data['tot_pag'].'</em> - <input type="text" size="2" name="mgslp_num" id="mg_img_pick_pp" value="'.$per_page.'" /> <em>images per page</em>';	
 			}
+			else { echo '<input type="text" size="2" name="mgslp_num" id="mg_img_pick_pp" value="'.$per_page.'" /> <em>images per page</em>';	}
 			
-		echo '</td><td style="width: 40%; text-align: right;">';
+		echo '</td><td style="width: 35%; text-align: right;">';
 			if($img_data['more'] != false)  {
 				echo '<input type="button" class="mg_img_pick_next button-secondary" id="slp_'. ($page + 1) .'" name="mgslp_n" value="Next images &raquo;" />';
 			}
@@ -464,22 +469,25 @@ add_action('wp_ajax_mg_img_picker', 'mg_img_picker');
 ///////////////////////////////////////////////////
 function mg_sel_img_reload() {	
 	require_once(MG_DIR . '/functions.php');
-	$tt_path = MG_URL . '/classes/timthumb.php'; 
+	$tt_path = MG_TT_URL; 
 	
 	if(!isset($_POST['images'])) { $images = array();}
 	else { $images = $_POST['images'];}
 	
 	// get the titles and recreate tracks
-	$images = mg_existing_sel_img($images);
+	$images = mg_existing_sel($images);
 	$new_img = '';
 	
 	if(!$images) {$new_img = '<p>No images selected .. </p>';}
 	else {
-		foreach($images as $img) {
+		foreach($images as $img_id) {
+			$img_data = get_post($img_id);
+			$img_url = $img_data->guid;
+			
 			$new_img .= '
 			<li>
-				<input type="hidden" name="mg_slider_img[]" value="'.$img.'" />
-				<img src="'.$tt_path.'?src='.$img.'&w=90&h=90" />
+				<input type="hidden" name="mg_slider_img[]" value="'.$img_id.'" />
+				<img src="'.$tt_path.'?src='.$img_url.'&w=90&h=90" />
 				<span title="remove image"></span>
 			</li>
 			';	
@@ -498,11 +506,15 @@ add_action('wp_ajax_mg_sel_img_reload', 'mg_sel_img_reload');
 
 function mg_audio_picker() {	
 	require_once(MG_DIR . '/functions.php');
-	$tt_path = MG_URL . '/classes/timthumb.php'; 
+	$tt_path = MG_TT_URL; 
 	
 	if(!isset($_POST['page'])) {$page = 1;}
-	$page = (int)addslashes($_POST['page']);
-	$audio_data = mg_library_audio($page);
+	else {$page = (int)addslashes($_POST['page']);}
+	
+	if(!isset($_POST['per_page'])) {$per_page = 15;}
+	else {$per_page = (int)addslashes($_POST['per_page']);}
+	
+	$audio_data = mg_library_audio($page, $per_page);
 	
 	echo '<ul>';
 	
@@ -530,8 +542,9 @@ function mg_audio_picker() {
 		echo '</td><td style="width: 20%; text-align: center;">';
 		
 			if($audio_data['tot'] > 0 && $audio_data['tot_pag'] > 1) {
-				echo '<em>page '.$audio_data['pag'].' of '.$audio_data['tot_pag'].'</em>';	
+				echo '<em>page '.$audio_data['pag'].' of '.$audio_data['tot_pag'].'</em> - <input type="text" size="2" name="mgslp_num" id="mg_audio_pick_pp" value="'.$per_page.'" /> <em>tracks per page</em>';		
 			}
+			else { echo '<input type="text" size="2" name="mgslp_num" id="mg_audio_pick_pp" value="'.$per_page.'" /> <em>tracks per page</em>'; }
 			
 		echo '</td><td style="width: 40%; text-align: right;">';
 			if($audio_data['more'] != false)  {
@@ -556,7 +569,7 @@ function mg_sel_audio_reload() {
 	if(!isset($_POST['tracks'])) { $tracks = array();}
 	else { $tracks = $_POST['tracks'];}
 	
-	$tracks = mg_existing_sel_tracks($tracks);
+	$tracks = mg_existing_sel($tracks);
 	
 	// get the titles and recreate tracks
 	$new_tracks = '';

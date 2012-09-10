@@ -77,9 +77,10 @@ h1, h2, h3, nav { font-family: 'Alfa Slab One', Arial, sans-serif; font-weight:4
    Sidebar
    ========================================================================== */
 
-#sidebar { }
-
-
+#sidebar { min-height:600px; background: url('../img/bg-blue.png') left top repeat; }
+  #sidebar.span3 {width:250px; }
+  
+#main.span9 { width:670px; }
 
 /* ==========================================================================
    Posts

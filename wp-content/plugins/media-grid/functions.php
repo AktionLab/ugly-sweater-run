@@ -168,7 +168,7 @@ function mg_get_type_opt_fields($type, $post) {
 		<tr>
           <td class="lcwp_label_td">'.$opt.'</td>
           <td class="lcwp_field_td">
-		  	<input type="text" name="mg_'.$type.'_'.strtolower(lcwp_stringToUrl($opt)).'" value="'.htmlentities($val, ENT_QUOTES).'" />
+		  	<input type="text" name="mg_'.$type.'_'.strtolower(lcwp_stringToUrl($opt)).'" value="'.$val.'" />
           </td>     
           <td><span class="info"></span></td>
         </tr>
@@ -187,6 +187,14 @@ function mg_types_meta_opt($type) {
 	if($type == 'img_gallery') {
 		$opt_arr = array(
 			array(
+				'label' 	=> 'Display captions?',
+				'name'		=> 'mg_slider_captions',
+				'descr'		=> 'If checked displays the captions in the slider',
+				'type' 		=> 'checkbox',
+				'validate'	=> array('index'=>'mg_slider_captions', 'label'=>'Slider Captions')
+			),
+			array(
+				'type' 		=> 'empty',
 				'validate'	=> array('index'=>'mg_slider_img', 'label'=>'Slider Images')
 			)
 		);
@@ -248,38 +256,40 @@ function mg_meta_opt_generator($type, $post) {
 	$opt_data = '<table class="widefat lcwp_table lcwp_metabox_table">';
 	
 	foreach($opt_arr as $opt) {
-		$val = get_post_meta($post->ID, $opt['name'], true);
-	
-		$opt_data .= '
-		<tr>
-          <td class="lcwp_label_td">'.$opt['label'].'</td>
-          <td class="lcwp_field_td">';
-		  
-		if($opt['type'] == 'text') {  
-			$opt_data .= '<input type="text" name="'.$opt['name'].'" value="'.$val.'" />';
-		}
-		
-		elseif($opt['type'] == 'select') {
-			$opt_data .= '<select data-placeholder="Select an option .." name="'.$opt['name'].'" class="chzn-select" tabindex="2">';
+		if($opt['type'] != 'empty') {
+			$val = get_post_meta($post->ID, $opt['name'], true);
 			
-			foreach($opt['options'] as $key=>$name) {
-				($key == $val) ? $sel = 'selected="selected"' : $sel = '';
-				$opt_data .= '<option value="'.$key.'" '.$sel.'>'.$name.'</option>';	
+			$opt_data .= '
+			<tr>
+			  <td class="lcwp_label_td">'.$opt['label'].'</td>
+			  <td class="lcwp_field_td">';
+			  
+			if($opt['type'] == 'text') {  
+				$opt_data .= '<input type="text" name="'.$opt['name'].'" value="'.$val.'" />';
 			}
 			
-			$opt_data .= '</select>';
-		} 
-		
-		elseif($opt['type'] == 'checkbox') {
-			($val) ? $sel = 'checked="checked"' : $sel = '';
-			$opt_data .= '<input type="checkbox" name="'.$opt['name'].'" value="1" class="ip-checkbox" '.$sel.' />';	
+			elseif($opt['type'] == 'select') {
+				$opt_data .= '<select data-placeholder="Select an option .." name="'.$opt['name'].'" class="chzn-select" tabindex="2">';
+				
+				foreach($opt['options'] as $key=>$name) {
+					($key == $val) ? $sel = 'selected="selected"' : $sel = '';
+					$opt_data .= '<option value="'.$key.'" '.$sel.'>'.$name.'</option>';	
+				}
+				
+				$opt_data .= '</select>';
+			} 
+			
+			elseif($opt['type'] == 'checkbox') {
+				($val) ? $sel = 'checked="checked"' : $sel = '';
+				$opt_data .= '<input type="checkbox" name="'.$opt['name'].'" value="1" class="ip-checkbox" '.$sel.' />';	
+			}
+			  
+			$opt_data .= ' 
+			  </td>     
+			  <td><span class="info">'.$opt['descr'].'</span></td>
+			</tr>
+			';
 		}
-		  
-		$opt_data .= ' 
-		  </td>     
-          <td><span class="info">'.$opt['descr'].'</span></td>
-        </tr>
-		';
 	}
 	
 	return $opt_data . '</table>';
@@ -394,9 +404,7 @@ function mg_grid_builder_items_data($items) {
 
 
 // get the images from the WP library
-function mg_library_images($page = 1) {
-	$per_page = 15;
-	
+function mg_library_images($page = 1, $per_page = 15) {
 	$query_images_args = array(
 		'post_type' => 'attachment', 'post_mime_type' =>'image', 'post_status' => 'inherit', 'posts_per_page' => $per_page, 'paged' => $page
 	);
@@ -404,7 +412,12 @@ function mg_library_images($page = 1) {
 	$query_images = new WP_Query( $query_images_args );
 	$images = array();
 	
-	foreach ( $query_images->posts as $image) { $images[] = $image->guid; }
+	foreach ( $query_images->posts as $image) { 
+		$images[] = array(
+			'id'	=> $image->ID,
+			'url' 	=> $image->guid
+		);
+	}
 	
 	// global images number
 	$img_num = $query_images->found_posts;
@@ -420,29 +433,8 @@ function mg_library_images($page = 1) {
 }
 
 
-// given an array of selected images - returns only existing ones
-function mg_existing_sel_img($images) {
-	if(is_array($images)) {
-		$new_array = array();
-		
-		foreach($images as $img) {
-			$img_path = str_replace(get_bloginfo('wpurl').'/', ABSPATH, $img);
-			if( file_exists($img_path)) {	
-				$new_array[] = $img;
-			}
-		}
-		
-		if(count($new_array) == 0) {return false;}
-		else {return $new_array;}
-	}
-	else {return false;}
-}
-
-
 // get the audio files from the WP library
-function mg_library_audio($page = 1) {
-	$per_page = 15;
-	
+function mg_library_audio($page = 1, $per_page = 15) {
 	$query_audio_args = array(
 		'post_type' => 'attachment', 'post_mime_type' =>'audio', 'post_status' => 'inherit', 'posts_per_page' => $per_page, 'paged' => $page
 	);
@@ -472,21 +464,21 @@ function mg_library_audio($page = 1) {
 }
 
 
-// given an array of selected tracks - returns only existing ones
-function mg_existing_sel_tracks($tracks) {
-	if(is_array($tracks)) {
+// given an array of selected images or tracks - returns only existing ones
+function mg_existing_sel($media) {
+	if(is_array($media)) {
 		$new_array = array();
 		
-		foreach($tracks as $track_id) {
-			if( get_the_title($track_id)) {	
-				$new_array[] = $track_id;
+		foreach($media as $media_id) {
+			if( get_the_title($media_id)) {	
+				$new_array[] = $media_id;
 			}
 		}
 		
 		if(count($new_array) == 0) {return false;}
 		else {return $new_array;}
 	}
-	else {return false;}
+	else {return false;}	
 }
 
 
@@ -789,7 +781,7 @@ function mg_frontend_layout($post_id) {
 	$res_method = get_post_meta($post_id, 'mg_img_res_method', true);
 
 	// timthumb
-	$tt_path = MG_URL . '/classes/timthumb.php';
+	$tt_path = MG_TT_URL;
 	
 	// canvas color for TT
 	(get_option('mg_item_bg_color')) ? $tt_canvas = substr(get_option('mg_item_bg_color'), 1) : $tt_canvas = 'ffffff';
@@ -820,7 +812,6 @@ function mg_frontend_layout($post_id) {
 	}
 	
 	elseif($type == 'img_gallery') {
-		$src = wp_get_attachment_image_src(get_post_thumbnail_id($post_id), 'full');
 		$slider_img = get_post_meta($post_id, 'mg_slider_img', true);
 		
 		$featured = '
@@ -829,15 +820,24 @@ function mg_frontend_layout($post_id) {
 		';
 		  
 		  if(is_array($slider_img)) {
-			  foreach($slider_img as $img) {
-				  $s_img_sizes = getimagesize($img);
-				  $max_h = (int)get_post_meta($post_id, 'mg_img_maxheight', true);
-
-				  if(is_array($s_img_sizes) && $max_h > 0 && $s_img_sizes[1] > $max_h) {$img_url = $tt_path.'?src='.$img.'&w='.$tt_w.'&h='.$max_h.'&cc='.$tt_canvas.'zc='.$res_method.'&q=100';}
-				  else {$img_url = $img;}
+			  foreach($slider_img as $img_id) {
+				  $src = wp_get_attachment_image_src($img_id, 'full');
 				  
+				  $max_h = (int)get_post_meta($post_id, 'mg_img_maxheight', true);
+				  if($max_h > 0 && $src[2] > $max_h) {$img_url = $tt_path.'?src='.$src[0].'&w='.$tt_w.'&h='.$max_h.'&cc='.$tt_canvas.'&a=t&zc='.$res_method.'&q=100';}
+				  else {$img_url = $src[0];}
+					
+				  if(get_post_meta($post_id, 'mg_slider_captions', true) == 1) {
+					 $img_data = get_post($img_id);
+					 $caption = trim($img_data->post_content);
+					 
+					 ($caption == '') ? $caption_code = '' :  $caption_code = '<div class="wmuSliderCaption"><div>' . $caption . '</div></div>';
+				  }
+				  else {$caption_code = '';}
+					 
 				  $featured .= '
 				  <article>	
+				  	'.$caption_code.'
 					<img src="'.$img_url.'" alt="" />
 				  </article>';	
 			  }
@@ -999,7 +999,7 @@ function mg_frontend_layout($post_id) {
 			<?php if($layout == 'full' && count($cust_opt) > 0) {echo '</div>';} ?>
 			
 			<div class="mg_item_text <?php if($layout == 'full' && count($cust_opt) == 0) {echo 'mg_widetext';} ?>">
-				<?php echo do_shortcode( nl2br(get_post_field('post_content', $post_id)) ); ?>
+				<?php echo do_shortcode( wpautop(get_post_field('post_content', $post_id)) ); ?>
             </div>
             
             <?php 

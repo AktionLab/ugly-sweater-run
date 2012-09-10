@@ -29,7 +29,7 @@ function mg_shortcode( $atts, $content = null ) {
 	
 	/////////////////////////
 	// grid contents
-	
+		
 	$items_list = get_option('mg_grid_'.$cat.'_items');
 	$items_w = get_option('mg_grid_'.$cat.'_items_width');
 	$items_h = get_option('mg_grid_'.$cat.'_items_height');
@@ -51,7 +51,7 @@ function mg_shortcode( $atts, $content = null ) {
 		
 		
 		// calculate the thumb img size
-		$tt_path = MG_URL . '/classes/timthumb.php';
+		$tt_path = MG_TT_URL;
 		$thb_w = 960 * mg_size_to_perc($cell_width);
 		$thb_h = 960 * mg_size_to_perc($cell_height);
 		
@@ -245,6 +245,20 @@ function mg_shortcode( $atts, $content = null ) {
 	////////////////////////////////
 
 	$grid .= '</div></div>';
+
+
+	// Ajax init
+	if(get_option('mg_enable_ajax')) {
+		$grid .= '
+		<script type="text/javascript">
+		jQuery(document).ready(function($) { 
+			if( eval("typeof mg_ajax_init == \'function\'") ) {
+				mg_ajax_init('.$cat.');
+			}
+		});
+		</script>
+		';
+	}
 
 	return $grid;
 }

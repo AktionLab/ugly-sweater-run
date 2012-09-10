@@ -50,7 +50,7 @@ function mg_update_notifier_bar_menu() {
 	if (function_exists('simplexml_load_string')) { // Stop if simplexml_load_string funtion isn't available
 		global $wp_admin_bar, $wpdb;
 	
-		if ( !is_super_admin() || !is_admin_bar_showing() ) // Don't display notification in admin bar if it's disabled or the current user isn't an administrator
+		if ( !function_exists('is_admin_bar_showing') || !is_super_admin() || !is_admin_bar_showing() ) // Don't display notification in admin bar if it's disabled or the current user isn't an administrator
 		return;
 		
 		$xml = mg_get_latest_plugin_version(MG_PLUGIN_NOTIFIER_CACHE_INTERVAL); // Get the latest remote XML file on our server

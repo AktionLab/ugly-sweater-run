@@ -29,6 +29,8 @@ $types = array('image', 'img_gallery', 'video', 'audio');
 		$indexes[] = array('index'=>'mg_twitter', 'label'=>__( 'Twitter Button', 'lcwp_ml' ));
 		$indexes[] = array('index'=>'mg_pinterest', 'label'=>__( 'Pinterest Button', 'lcwp_ml' ));
 		$indexes[] = array('index'=>'mg_js_head', 'label'=>__( 'Javascript in Header', 'lcwp_ml' ));
+		$indexes[] = array('index'=>'mg_old_jquery', 'label'=>__( 'JS for old jQuery', 'lcwp_ml' ));
+		$indexes[] = array('index'=>'mg_enable_ajax', 'label'=>__( 'Enable Ajax Support', 'lcwp_ml' ));
 
 		$indexes[] = array('index'=>'mg_cells_border_color', 'label'=>__( 'Cells border color', 'lcwp_ml' ), 'type'=>'hex');
 		$indexes[] = array('index'=>'mg_img_border_color', 'label'=>__( 'Image Border Color', 'lcwp_ml' ));
@@ -120,7 +122,9 @@ $types = array('image', 'img_gallery', 'video', 'audio');
 		$fdata['mg_twitter'] = get_option('mg_twitter');  
 		$fdata['mg_pinterest'] = get_option('mg_pinterest'); 
 		$fdata['mg_js_head'] = get_option('mg_js_head'); 
-		
+		$fdata['mg_old_jquery'] = get_option('mg_old_jquery'); 
+		$fdata['mg_enable_ajax'] = get_option('mg_enable_ajax'); 
+
 		$fdata['mg_cells_border_color'] = get_option('mg_cells_border_color'); 
 		$fdata['mg_img_border_color'] = get_option('mg_img_border_color');  
 		$fdata['mg_img_border_opacity'] = get_option('mg_img_border_opacity'); 
@@ -316,6 +320,28 @@ $types = array('image', 'img_gallery', 'video', 'audio');
             	<span class="info">Put javascript in the website header, check it ONLY IF you notice some incompatibilities</span>
             </td>
           </tr> 
+          <tr>
+            <td class="lcwp_label_td"><?php _e("Old jQuery compatibility mode?" ); ?></td>
+            <td class="lcwp_field_td">
+                <?php ($fdata['mg_old_jquery'] == 1) ? $sel = 'checked="checked"' : $sel = ''; ?>
+                <input type="checkbox" value="1" name="mg_old_jquery" class="ip-checkbox" <?php echo $sel; ?> />
+            </td>
+            <td>
+            	<span class="info">Could solve issues on old jQuery versions, check it ONLY IF you notice some issues</span>
+            </td>
+          </tr> 
+          <tr>
+            <td class="lcwp_label_td"><?php _e("Enable the AJAX support?" ); ?></td>
+            <td class="lcwp_field_td">
+                <?php ($fdata['mg_enable_ajax'] == 1) ? $sel = 'checked="checked"' : $sel = ''; ?>
+                <input type="checkbox" value="1" name="mg_enable_ajax" class="ip-checkbox" <?php echo $sel; ?> />
+            </td>
+            <td>
+            	<span class="info">Enable the support for AJAX-loaded grids</span>
+            </td>
+          </tr>
+          
+         
         </table> 
     </div>
 

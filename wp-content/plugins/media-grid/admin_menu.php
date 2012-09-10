@@ -329,7 +329,7 @@ function mg_cat_id_to_cat_term($query) {
 ///////////////////////////////////////////////////////
 // FIX FOR THEMES THAT DON'T SUPPOR FEATURED IMAGE
 function mg_add_thumb_support() {
-    $supportedTypes = get_theme_support( 'post-thumbnails' );
+	(function_exists('get_theme_support')) ? $supportedTypes = get_theme_support( 'post-thumbnails' ) : $supportedTypes = false;
 
     if( $supportedTypes === false ) {
         add_theme_support( 'post-thumbnails', array( 'mg_items' ) ); 

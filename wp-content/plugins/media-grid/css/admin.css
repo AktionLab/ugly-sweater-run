@@ -264,6 +264,11 @@
 	adding: 3px;	
 }
 
+/* fix for chosen dropdowns */
+.lcwp_table td {
+	overflow: visible !important;	
+}
+
 
 /************************** */
 

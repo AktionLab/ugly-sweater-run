@@ -4,7 +4,7 @@ Plugin Name: Media Grid
 Plugin URI: http://codecanyon.net/item/media-grid-wordpress-responsive-portfolio/2218545?ref=LCweb
 Description: Create stunning responsive portfolios using the responsive grid layout. Display videos, images, galleries and audio files. Choose the colours and the graphic settings. Set the parameters to display in the items description.
 Author: Luca Montanari
-Version: 1.21
+Version: 1.4
 Author URI: http://codecanyon.net/user/LCweb?ref=LCweb
 */  
 
@@ -14,12 +14,17 @@ Author URI: http://codecanyon.net/user/LCweb?ref=LCweb
 /////////////////////////////////////////////
 
 // plugin path
-$wp_plugin_dir = ABSPATH . 'wp-content/plugins';
-define( 'MG_DIR', $wp_plugin_dir . '/media-grid' );
+$wp_plugin_dir = substr(plugin_dir_path(__FILE__), 0, -1);
+define( 'MG_DIR', $wp_plugin_dir);
 
 // plugin url
-$wp_plugin_url = get_bloginfo('url') . '/wp-content/plugins';
-define( 'MG_URL', $wp_plugin_url . '/media-grid' );
+$wp_plugin_url = substr(plugin_dir_url(__FILE__), 0, -1);
+define( 'MG_URL', $wp_plugin_url);
+
+
+// timthumb url - also for MU
+if(is_multisite()){ define('MG_TT_URL', MG_URL . '/classes/timthumb_MU.php'); }
+else { define( 'MG_TT_URL', MG_URL . '/classes/timthumb.php'); }
 
 
 
@@ -65,11 +70,14 @@ function mg_global_scripts() {
 	}
 	
 	if (!is_admin()) {
+		// switch for standard and old-jquery javascript
+		(get_option('mg_old_jquery') != '1') ? $js_path = MG_URL . '/js/frontend.js' : $js_path = MG_URL . '/js/frontend_old_jquery.js';
+		
 		// frontent JS on header or footer
 		if(get_option('mg_js_head') != '1') {
-			wp_enqueue_script('mg-frontend-js', MG_URL . '/js/frontend.js', 100, '', true);	
+			wp_enqueue_script('mg-frontend-js', $js_path, 100, '', true);	
 		}
-		else { wp_enqueue_script('mg-frontend-js', MG_URL . '/js/frontend.js'); }
+		else { wp_enqueue_script('mg-frontend-js', $js_path); }
 
 		// frontend css
 		if(!get_option('mg_inline_css')) {
@@ -116,24 +124,6 @@ include(MG_DIR . '/update-notifier.php');
 
 
 //////////////////////////////////////////////////
-// CREATES CUSTOM CSS ON PLUGIN ACTIVATION
-function mg_init_custom_css() {
-	include(MG_DIR . '/functions.php');
-	if(!mg_create_frontend_css()) {
-		if(!get_option('mg_inline_css')) { add_option('mg_inline_css', '255', '', 'yes'); }
-		update_option('mg_inline_css', 1);	
-	}
-	
-	// hack for non-latin characters (FROM v1.11)
-	if(!get_option('mg_non_latin_char')) {
-		if(mg_cust_opt_exists()) {delete_option('mg_non_latin_char');}	
-		else {add_option('mg_non_latin_char', '1', '', 'yes');}
-	}
-}
-register_activation_hook(__FILE__, 'mg_init_custom_css');
-
-
-//////////////////////////////////////////////////
 // OVERLAY WRAPPER
 function mg_main_overlay() {
 	echo '
@@ -145,5 +135,71 @@ function mg_main_overlay() {
 	';
 }
 add_action('wp_footer', 'mg_main_overlay', 1);
+
+
+
+
+//////////////////////////////////////////////////
+// ACTIONS ON PLUGIN ACTIVATION
+function mg_init_custom_css() {
+	include(MG_DIR . '/functions.php');
+	
+	// create custom CSS
+	if(!mg_create_frontend_css()) {
+		if(!get_option('mg_inline_css')) { add_option('mg_inline_css', '255', '', 'yes'); }
+		update_option('mg_inline_css', 1);	
+	}
+	
+	// hack for non-latin characters (FROM v1.11)
+	if(!get_option('mg_non_latin_char')) {
+		if(mg_cust_opt_exists()) {delete_option('mg_non_latin_char');}	
+		else {add_option('mg_non_latin_char', '1', '', 'yes');}
+	}
+	
+	// update sliders (for versions < 1.3)
+	mg_update_img_sliders();
+}
+register_activation_hook(__FILE__, 'mg_init_custom_css');
+
+
+// update sliders function
+function mg_update_img_sliders() {
+	global $wpdb;
+	
+	// retrieve all the items
+	$args = array(
+		'numberposts' => -1, 
+		'post_type' => 'mg_items',
+	);
+	$posts_array = get_posts($args);
+	
+	if(is_array($posts_array)) {
+	
+		foreach($posts_array as $post) {
+			$gallery_items = get_post_meta($post->ID, 'mg_slider_img', true);
+			
+			if(is_array($gallery_items) && count($gallery_items) > 0) {
+				$new_array = array();
+				foreach($gallery_items as $img_url) {
+					if(filter_var($img_url, FILTER_VALIDATE_URL)) {
+						$query = "SELECT ID FROM ".$wpdb->posts." WHERE guid='".$img_url."'";
+						$id = (int)$wpdb->get_var($query);
+						
+						if(!is_int($id)) {var_dump($id); die('error during sliders update');}
+						$new_array[] = $id;
+					}
+					else {$new_array[] = $img_url;}
+				}
+				
+				delete_post_meta($post->ID, 'mg_slider_img');
+				add_post_meta($post->ID, 'mg_slider_img', $new_array, true);
+			}	
+		}
+	}
+	
+	return true;
+}
+
+
 
 ?>

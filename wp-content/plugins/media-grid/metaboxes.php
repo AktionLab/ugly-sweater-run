@@ -172,20 +172,27 @@ function mg_item_opt_box() {
           <?php // image gallery builder ?>
           <div id="mg_builder_img_gallery" <?php if(!$main_type || $main_type != 'img_gallery') {echo 'style="display: none;"';} ?>>	
             <?php 
-			$tt_path = MG_URL . '/classes/timthumb.php'; 
-			$images = mg_existing_sel_img(get_post_meta($post->ID, 'mg_slider_img', true)); 
+			$tt_path = MG_TT_URL; 
+			$images = mg_existing_sel(get_post_meta($post->ID, 'mg_slider_img', true)); 
 			?>
             
             <h4>Slider Images</h4>
+            <div style="border-bottom: 1px solid #DFDFDF; margin-bottom: 17px;" class="lcwp_form">
+            <?php echo mg_meta_opt_generator('img_gallery', $post); ?>
+            </div>
+            
             <div id="gallery_img_wrap">
             	<ul>
             	<?php 
 				if(is_array($images)) {
-					foreach($images as $img) {
+					foreach($images as $img_id) {
+						$img_data = get_post($img_id);
+						$img_url = $img_data->guid;
+						
 						echo '
 						<li>
-							<input type="hidden" name="mg_slider_img[]" value="'.$img.'" />
-							<img src="'.$tt_path.'?src='.$img.'&w=90&h=90" />
+							<input type="hidden" name="mg_slider_img[]" value="'.$img_id.'" />
+							<img src="'.$tt_path.'?src='.$img_url.'&w=90&h=90" />
 							<span title="remove image"></span>
 						</li>';			
 					}
@@ -210,8 +217,8 @@ function mg_item_opt_box() {
           <?php // audio builder ?>
           <div id="mg_builder_audio" <?php if(!$main_type || $main_type != 'audio') {echo 'style="display: none;"';} ?>>
 			 <?php 
-              $tt_path = MG_URL . '/classes/timthumb.php'; 
-              $tracks = mg_existing_sel_tracks(get_post_meta($post->ID, 'mg_audio_tracks', true)); 
+              $tt_path = MG_TT_URL; 
+              $tracks = mg_existing_sel(get_post_meta($post->ID, 'mg_audio_tracks', true)); 
               ?>
               
               <h4>Tracklist</h4>
@@ -308,6 +315,7 @@ function mg_item_opt_box() {
 		
 		////////////////////////
 		// audio
+		mg_audio_pp = 15;
 		mg_load_audio_picker(1);
 		
 		// reload the selected tracks to refresh their titles
@@ -331,18 +339,30 @@ function mg_item_opt_box() {
 			});	
 		}
 		
-		
 		// change tracks picker page
 		jQuery('.mg_audio_pick_back, .mg_audio_pick_next').live('click', function() {
 			var page = jQuery(this).attr('id').substr(4);
 			mg_load_audio_picker(page);
 		});
 		
+		// change tracks per page
+		jQuery('#mg_audio_pick_pp').live('change', function() {
+			var pp = jQuery(this).val();
+			
+			if( pp.length >= 2 ) {
+				if( parseInt(pp) < 15 ) { mg_audio_pp = 15;}
+				else {mg_audio_pp = pp;}
+				
+				mg_load_audio_picker(1);
+			}
+		});
+		
 		// load audio tracks picker
 		function mg_load_audio_picker(page) {
 			var data = {
 				action: 'mg_audio_picker',
-				page: page
+				page: page,
+				per_page: mg_audio_pp
 			};
 			
 			jQuery('#audio_tracks_picker').html('<div style="height: 30px;" class="lcwp_loading"></div>');
@@ -375,6 +395,7 @@ function mg_item_opt_box() {
 
 		////////////////////////
 		// images
+		mg_img_pp = 15;
 		mg_load_img_picker(1);
 		
 		// reload the selected images to check changes
@@ -398,18 +419,30 @@ function mg_item_opt_box() {
 			});	
 		}
 		
-		
 		// change slider imges picker page
 		jQuery('.mg_img_pick_back, .mg_img_pick_next').live('click', function() {
 			var page = jQuery(this).attr('id').substr(4);
 			mg_load_img_picker(page);
 		});
 		
+		// change images per page
+		jQuery('#mg_img_pick_pp').live('change', function() {
+			var pp = jQuery(this).val();
+			
+			if( pp.length >= 2 ) {
+				if( parseInt(pp) < 15 ) { mg_img_pp = 15;}
+				else {mg_img_pp = pp;}
+				
+				mg_load_img_picker(1);
+			}
+		});
+		
 		// load slider images picker
 		function mg_load_img_picker(page) {
 			var data = {
 				action: 'mg_img_picker',
-				page: page
+				page: page,
+				per_page: mg_img_pp
 			};
 			
 			jQuery('#gallery_img_picker').html('<div style="height: 30px;" class="lcwp_loading"></div>');
@@ -423,14 +456,15 @@ function mg_item_opt_box() {
 		
 		// add slider images
 		jQuery('#gallery_img_picker li').live('click', function() {
-			var img_url = jQuery(this).children('img').attr('id');
+			var img_id = jQuery(this).children('img').attr('id');
+			var img_url = jQuery(this).children('img').attr('src');
 			
 			if( jQuery('#gallery_img_wrap ul > p').size() > 0 ) {jQuery('#gallery_img_wrap ul').empty();}
 			
 			jQuery('#gallery_img_wrap ul').append('\
 			<li>\
-				<input type="hidden" name="mg_slider_img[]" value="'+ img_url +'" />\
-				<img src="<?php echo $tt_path; ?>?src='+ img_url +'&w=90&h=90" />\
+				<input type="hidden" name="mg_slider_img[]" value="'+ img_id +'" />\
+				<img src="'+ img_url +'" />\
 				<span title="remove image"></span>\
 			</li>');
 			
@@ -541,7 +575,7 @@ function mg_items_meta_save($post_id) {
 		$type_opt = mg_types_meta_opt($_POST['mg_main_type']);
 		if($type_opt) {
 			foreach($type_opt as $opt) {
-			$indexes[] = $opt['validate'];	
+				$indexes[] = $opt['validate'];	
 			}
 		}
 		
