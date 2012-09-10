@@ -20,7 +20,7 @@ define( 'MG_NOTIFIER_PLUGIN_NAME', 'Media Grid' ); // The plugin name
 define( 'MG_NOTIFIER_PLUGIN_SHORT_NAME', 'Media Grid' ); // The plugin short name, only if needed to make the menu item fit. Remove this if not needed
 define( 'MG_NOTIFIER_PLUGIN_FOLDER_NAME', 'media-grid' ); // The plugin folder name
 define( 'MG_NOTIFIER_PLUGIN_FILE_NAME', 'media-grid.php' ); // The plugin folder name
-define( 'MG_NOTIFIER_PLUGIN_XML_FILE', 'www.projects.lcweb.it/wp-content/plugins/media-grid/notifier.xml' ); // The remote notifier XML file containing the latest version of the plugin and changelog
+define( 'MG_NOTIFIER_PLUGIN_XML_FILE', 'http://www.projects.lcweb.it/wp-content/plugins/media-grid/notifier.xml' ); // The remote notifier XML file containing the latest version of the plugin and changelog
 define( 'MG_PLUGIN_NOTIFIER_CACHE_INTERVAL', 60 ); // The time interval for the remote XML cache in the database (21600 seconds = 6 hours)
 
 
