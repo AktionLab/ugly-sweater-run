@@ -15,16 +15,16 @@
 </h1>
 
 <div id="home-boxes" class="row">
-  <a class="hb-about sprite span3" href="">
+  <a class="hb-about sprite span3" href="/about">
     <h2>What is it?</h2>
   </a>
-  <a class="hb-find sprite span3" href="">
+  <a class="hb-find sprite span3" href="/locations">
     <h2>Find a run</h2>
   </a>
-  <a class="hb-gallery sprite span3" href="">
+  <a class="hb-gallery sprite span3" href="/gallery">
     <h2>Gallery</h2>
   </a>
-  <a class="hb-press sprite span3" href="">
+  <a class="hb-press sprite span3" href="/press">
     <h2>Press</h2>
   </a>
 </div><!--home-boxes-row-->  
