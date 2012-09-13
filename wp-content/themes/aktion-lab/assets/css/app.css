@@ -18,7 +18,7 @@ h1, h2, h3, nav { font-family: 'Alfa Slab One', Arial, sans-serif; font-weight:4
   #nav-main { position:absolute; right:0; top:12px; }
     .nav.snow li { padding-left:16px; float:left; 
       background: url('../img/sprite.png') -199px -96px; }
-      .nav.snow li:first-child { padding:0; background-image:none; }   
+      .nav.snow li:first-child { padding:0; background-image:none; }  
       .nav.snow li a { padding:5px; color:#cb1323; 
         text-transform:uppercase; letter-spacing:1px; font-size:18px; }
         .nav.snow li a:hover { color:#e10215; background:transparent; }
@@ -54,6 +54,7 @@ h1, h2, h3, nav { font-family: 'Alfa Slab One', Arial, sans-serif; font-weight:4
       letter-spacing:1px; font-size:18px; text-shadow: 1px 1px 2px #555; }     
     #nav-cities a:hover { background: url('../img/bg-blue.png') top left repeat;
       text-shadow: 1px 1px 2px #111; }
+    #nav-cities li:first-child a, #nav-cities li:first-child a:hover { color:#ddd; }   
 
 #hero-subhead { padding:0; margin: 5px 0 24px; text-align:center; text-transform:uppercase; letter-spacing: 1px; font-size:30px; color:#cb1323; }
   #hero-subhead span { width:80px; height:40px; padding:14px 0; margin-bottom:-22px; display:inline-block; background-position: -440px -235px; }  
