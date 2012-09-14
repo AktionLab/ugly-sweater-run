@@ -48,13 +48,14 @@ h1, h2, h3, nav { font-family: 'Alfa Slab One', Arial, sans-serif; font-weight:4
    ========================================================================== */
 
 #hero { position:relative; }
-  #nav-cities { position: absolute; top:0; left:20px; width:210px; height:340px; 
+  #nav-cities { position: absolute; top:0; left:20px; width:210px; height:340px;
     padding:10px 0; background: url('../img/bg-blue.png') top left repeat; }
-    #nav-cities a { padding:5px 8px; color:#fff; text-transform:uppercase; 
-      letter-spacing:1px; font-size:18px; text-shadow: 1px 1px 2px #555; }     
+    #nav-cities a { padding:5px 8px; color:#fff;
+      letter-spacing:1px; font-size:14px; text-shadow: 1px 1px 2px #555; }     
     #nav-cities a:hover { background: url('../img/bg-blue.png') top left repeat;
       text-shadow: 1px 1px 2px #111; }
-    #nav-cities li:first-child a, #nav-cities li:first-child a:hover { color:#ddd; }   
+    #nav-cities li:first-child a, #nav-cities li:first-child a:hover { color:#ddd; 
+      font-size:18px; text-transform:uppercase; }   
 
 #hero-subhead { padding:0; margin: 5px 0 24px; text-align:center; text-transform:uppercase; letter-spacing: 1px; font-size:30px; color:#cb1323; }
   #hero-subhead span { width:80px; height:40px; padding:14px 0; margin-bottom:-22px; display:inline-block; background-position: -440px -235px; }  
@@ -73,6 +74,55 @@ h1, h2, h3, nav { font-family: 'Alfa Slab One', Arial, sans-serif; font-weight:4
   #home-boxes .hb-gallery { background-position: 0 -267px; }
     #home-boxes .hb-gallery h2 { margin-top: 30px; }
   #home-boxes .hb-press { background-position: -220px -267px; }
+
+/* ==========================================================================
+   Locations Page
+   ========================================================================== */
+
+div#location-map {
+  width: 940px;
+  height: 650px;
+  position: relative;
+  background: transparent url("../img/map.jpg") 0 0 no-repeat;
+}
+
+a.icon {
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  position: absolute;
+  z-index: 1;
+  text-decoration: none;
+  background: transparent url("../img/snowflake.png") 0 0 no-repeat;
+}
+
+a.icon.chicago    { left: 609px; top: 245px; }
+a.icon.memphis    { left: 610px; top: 396px; }
+a.icon.denver     { left: 341px; top: 302px; }
+a.icon.scottsdale { left: 208px; top: 422px; }
+a.icon.omaha      { left: 499px; top: 272px; }
+a.icon.louisville { left: 325px; top: 269px; }
+
+a.icon span {
+  display: none;
+  position: relative;
+  top: -13px;
+  left: 13px;
+  z-index: 2;
+  width: 140px;
+  height: 16px;
+  padding: 6px;
+  white-space: nowrap;
+  background-color: #dd3322;
+  border: 1px solid #fff;
+  color: #fff;
+  text-align: center;
+  line-height: 16px;
+  font-family: arial;
+  font-weight: bold;
+  font-size: 11px;
+}
 
 /* ==========================================================================
    Sidebar

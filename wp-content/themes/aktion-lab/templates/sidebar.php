@@ -1,0 +1,1 @@
+<div style="padding:20px; color:#fff; font-weight:bold;"</style><p>More information coming soon!</p>
